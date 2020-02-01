@@ -1,7 +1,7 @@
 use actix_web::{web, HttpRequest, HttpResponse, Responder};
 
 async fn test_route(request: HttpRequest) -> impl Responder {
-    let name: String = request.match_info().get("name").unwrap_or("Unknown").to_string();
+    let name = request.match_info().get("name").unwrap_or("Unknown");
     return HttpResponse::Ok().body(format!("Hello world! {} is here", name));
 }
 
