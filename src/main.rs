@@ -1,18 +1,16 @@
-use actix_web::{web, App, HttpRequest, HttpResponse, HttpServer, Responder};
+use actix_web::{App, HttpServer};
 
 use std::io::Result;
 
-async fn test_route(request: HttpRequest) -> impl Responder {
-    let name: String = request.match_info().get("name").unwrap_or("Unknown").to_string();
-    return HttpResponse::Ok().body(format!("Hello world! {} is here", name));
-}
+mod routes;
 
 #[actix_rt::main]
 async fn main() -> Result<()> {
+    let bind_address = "127.0.0.1:8080";
+
     HttpServer::new(|| {
-        App::new().route("/test", web::get().to(greet))
-                  .route("/test/{name}", web::get().to(greet))
-    }).bind("127.0.0.1:8080")?
+        App::new().configure(routes::register_routes)
+    }).bind(bind_address)?
       .run()
       .await
 }
