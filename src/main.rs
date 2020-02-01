@@ -2,7 +2,7 @@ use actix_web::{web, App, HttpRequest, HttpResponse, HttpServer, Responder};
 
 use std::io::Result;
 
-async fn greet(request: HttpRequest) -> impl Responder {
+async fn test_route(request: HttpRequest) -> impl Responder {
     let name: String = request.match_info().get("name").unwrap_or("Unknown").to_string();
     return HttpResponse::Ok().body(format!("Hello world! {} is here", name));
 }
@@ -10,8 +10,8 @@ async fn greet(request: HttpRequest) -> impl Responder {
 #[actix_rt::main]
 async fn main() -> Result<()> {
     HttpServer::new(|| {
-        App::new().route("/", web::get().to(greet))
-                  .route("/{name}", web::get().to(greet))
+        App::new().route("/test", web::get().to(greet))
+                  .route("/test/{name}", web::get().to(greet))
     }).bind("127.0.0.1:8080")?
       .run()
       .await
