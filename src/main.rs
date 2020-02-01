@@ -1,10 +1,10 @@
-use actix_web::{web, App, HttpRequest, HttpServer, Responder};
+use actix_web::{web, App, HttpRequest, HttpResponse, HttpServer, Responder};
 
 use std::io::Result;
 
 async fn greet(request: HttpRequest) -> impl Responder {
     let name: String = request.match_info().get("name").unwrap_or("Unknown").to_string();
-    return format!("Hello world! {} is here", name);
+    return HttpResponse::Ok().body(format!("Hello world! {} is here", name));
 }
 
 #[actix_rt::main]
