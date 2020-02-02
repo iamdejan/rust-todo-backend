@@ -2,7 +2,7 @@ use actix_web::{web, HttpRequest, HttpResponse};
 use mongodb::{Client};
 use bson::{doc};
 
-use crate::memo::Memo;
+use crate::model::memo::Memo;
 
 async fn test_route(request: HttpRequest) -> HttpResponse {
     let name = request.match_info().get("name").unwrap_or("Unknown");
