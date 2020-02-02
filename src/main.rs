@@ -8,8 +8,6 @@ extern crate serde;
 extern crate serde_derive;
 
 mod routes;
-
-//used so that "routes" module can access "memo" module
 mod model;
 
 fn initiate_mongodb(db_url: &str) -> Client {
@@ -26,7 +24,7 @@ async fn main() -> Result<()> {
     let client = initiate_mongodb("mongodb://localhost:27017");
     HttpServer::new(move || {
         println!("Starting Actix-Web server...");
-        return App::new().data(client.clone()).configure(routes::register_routes);
+        return App::new().data(client.clone()).configure(routes::routes::register_routes);
     }).bind(bind_address)
       .expect("Fail to run server!")
       .run()
