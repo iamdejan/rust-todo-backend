@@ -1,4 +1,4 @@
-use actix_web::{test, App, body::Body::*};
+use actix_web::{test, App};
 use crate::routes::{routes};
 use crate::model::memo::Memo;
 use std::str;
@@ -23,19 +23,13 @@ fn testing_false() {
 
 #[actix_rt::test]
 async fn testing_hello_world_route() {
-    let request = test::TestRequest::with_uri("/test").to_http_request();
-    let response = routes::test_route(request).await;
+    let mut app = test::init_service(App::new().configure(routes::register_routes)).await;
+    let request = test::TestRequest::with_uri("/test").to_request();
+    let response = test::call_service(&mut app, request).await;
     assert!(response.status().is_success());
 
-    let body = response.body().as_ref().unwrap();
-    match body {
-        None => panic!(),
-        Empty => panic!(),
-        Message(_) => panic!(),
-        Bytes(v) => {
-            assert_eq!(str::from_utf8(v).unwrap(), "Hello world! Unknown is here");
-        }
-    }
+    let data = test::read_body(response).await;
+    assert_eq!("Hello world! Unknown is here", str::from_utf8(&data).unwrap());
 }
 
 #[actix_rt::test]
