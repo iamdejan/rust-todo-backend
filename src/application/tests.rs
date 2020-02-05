@@ -1,6 +1,6 @@
 use actix_web::{test, App};
-use crate::routes::{routes};
-use crate::model::memo::Memo;
+use crate::application::{routes};
+use crate::domain::entities::Memo;
 use std::str;
 use mongodb::{Client, options::ClientOptions};
 
