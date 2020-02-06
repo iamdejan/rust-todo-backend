@@ -9,7 +9,7 @@ pub async fn route_initial_test(request: HttpRequest) -> HttpResponse {
 }
 
 #[allow(non_snake_case)]
-pub async fn get_all_TODOs(memo_handler: web::Data<MemoHandler<'_>>) -> HttpResponse {
+pub async fn get_all_TODOs<'a>(memo_handler: web::Data<MemoHandler<'a>>) -> HttpResponse {
     let response_data: Vec<Memo> = memo_handler.get_all();
     return HttpResponse::Ok().json(response_data);
 }

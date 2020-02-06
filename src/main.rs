@@ -12,6 +12,7 @@ use std::io::Result;
 use actix_web::{App, HttpServer};
 use mongodb::{Client, options::ClientOptions};
 
+use domain::repositories::MemoRepository;
 use infrastructure::repositories::PersistentMemoRepository;
 
 use domain::handlers::MemoHandler;
@@ -27,11 +28,10 @@ fn initiate_mongodb(db_url: &str) -> Client {
 async fn main() -> Result<()> {
     let bind_address = "127.0.0.1:8080";
 
-    let memo_repository: PersistentMemoRepository = PersistentMemoRepository::new(initiate_mongodb("mongodb://localhost:27017"));
-
-    HttpServer::new(move || {
+    HttpServer::new(|| {
+        let memo_repository: &'static dyn MemoRepository = &PersistentMemoRepository::new(initiate_mongodb("mongodb://localhost:27017"));
         println!("Starting Actix-Web server...");
-        return App::new().data(MemoHandler::new(&memo_repository.to_owned())).configure(application::routes::register_routes);
+        return App::new().data(MemoHandler::new(memo_repository)).configure(application::routes::register_routes);
     }).bind(bind_address)
       .expect("Fail to run server!")
       .run()

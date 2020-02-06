@@ -6,7 +6,7 @@ pub struct MemoHandler<'a> {
 }
 
 impl<'a> MemoHandler<'a> {
-    pub fn new(memo_repository: &impl MemoRepository) -> MemoHandler {
+    pub fn new(memo_repository: &dyn MemoRepository) -> MemoHandler {
         return MemoHandler {
             memo_repository
         };
