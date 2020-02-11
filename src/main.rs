@@ -3,6 +3,9 @@ extern crate serde;
 #[macro_use]
 extern crate serde_derive;
 
+#[macro_use]
+extern crate lazy_static;
+
 mod application;
 mod domain;
 mod infrastructure;
@@ -24,14 +27,17 @@ fn initiate_mongodb(db_url: &str) -> Client {
     return client;
 }
 
+lazy_static! {
+    pub static ref memo_repository: dyn MemoRepository = PersistentMemoRepository::new(initiate_mongodb("mongodb://localhost:27017"));
+}
+
 #[actix_rt::main]
 async fn main() -> Result<()> {
     let bind_address = "127.0.0.1:8080";
 
     HttpServer::new(|| {
-        let memo_repository: &'static dyn MemoRepository = &PersistentMemoRepository::new(initiate_mongodb("mongodb://localhost:27017"));
         println!("Starting Actix-Web server...");
-        return App::new().data(MemoHandler::new(memo_repository)).configure(application::routes::register_routes);
+        return App::new().data(MemoHandler::new(&memo_repository)).configure(application::routes::register_routes);
     }).bind(bind_address)
       .expect("Fail to run server!")
       .run()
