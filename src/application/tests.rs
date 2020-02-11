@@ -1,15 +1,9 @@
 use actix_web::{test, App};
+use crate::db_connection;
 use crate::routes::{routes};
 use crate::model::memo::Memo;
 use std::str;
 use mongodb::{Client, options::ClientOptions};
-
-fn initiate_mongodb(db_url: &str) -> Client {
-    let mut client_options: ClientOptions = ClientOptions::parse(db_url).unwrap();
-    client_options.app_name = Some("todo_backend".to_string());
-    let client = Client::with_options(client_options).unwrap();
-    return client;
-}
 
 #[test]
 fn testing_true() {
@@ -48,7 +42,7 @@ async fn testing_hello_world_route_with_name() {
 async fn testing_get_all_TODOs() {
     //TODO: use mock database
     let mut app = test::init_service(
-        App::new().data(initiate_mongodb("mongodb://localhost:27017")).configure(routes::register_routes)
+        App::new().configure(routes::register_routes)
     ).await;
     let request = test::TestRequest::get().uri("/todos").to_request();
     let result: Vec<Memo> = test::read_response_json(&mut app, request).await;
