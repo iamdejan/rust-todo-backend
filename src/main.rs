@@ -9,7 +9,6 @@ extern crate serde_derive;
 mod application;
 mod domain;
 mod infrastructure;
-mod db_connection;
 
 #[actix_rt::main]
 async fn main() -> Result<()> {

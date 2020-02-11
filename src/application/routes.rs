@@ -1,8 +1,6 @@
 use actix_web::{web, HttpRequest, HttpResponse};
-use mongodb::{Client};
-use bson::{doc};
 
-use crate::model::memo::Memo;
+use crate::domain::handlers::MemoHandler;
 
 pub async fn test_route(request: HttpRequest) -> HttpResponse {
     let name = request.match_info().get("name").unwrap_or("Unknown");
@@ -10,28 +8,14 @@ pub async fn test_route(request: HttpRequest) -> HttpResponse {
 }
 
 #[allow(non_snake_case)]
-pub async fn get_all_TODOs(client: web::Data<Client>) -> HttpResponse {
-    let db = client.database("todo");
-    let collection = db.collection("todo");
-
-    let filter = doc! {};
-    let all_data_cursor = collection.find(filter, None).unwrap();
-
-    let mut response_data: Vec<Memo> = Vec::new();
-    for result in all_data_cursor {
-        if result.is_ok() {
-            let data: bson::ordered::OrderedDocument = result.unwrap();
-            let memo_parse_result = bson::from_bson(bson::Bson::Document(data));
-            if memo_parse_result.is_ok() != true {
-                return HttpResponse::InternalServerError().body("");
-            }
-            response_data.push(memo_parse_result.unwrap());
-        } else {
-            return HttpResponse::InternalServerError().body("");
-        }
+pub async fn get_all_TODOs() -> HttpResponse {
+    let memo_handler: MemoHandler = MemoHandler::new();
+    let result = memo_handler.get_all();
+    if result.is_ok() != true {
+        return HttpResponse::InternalServerError().body("");
     }
 
-    return HttpResponse::Ok().json(response_data);
+    return HttpResponse::Ok().json(result.unwrap);
 }
 
 pub fn register_routes(app: &mut web::ServiceConfig) {
