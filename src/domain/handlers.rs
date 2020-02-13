@@ -8,7 +8,6 @@ pub struct MemoHandler<R: MemoRepository + ?Sized> {
 
 impl MemoHandler<PersistentMemoRepository> {
     pub fn new() -> Self {
-        //TODO: create strategy pattern based on parameter
         return Self {
             memo_repository: PersistentMemoRepository::new()
         };
