@@ -9,13 +9,16 @@ pub async fn test_route(request: HttpRequest) -> HttpResponse {
 
 #[allow(non_snake_case)]
 pub async fn get_all_TODOs() -> HttpResponse {
-    let memo_handler: MemoHandler = MemoHandler::new();
+    let memo_handler = MemoHandler::new();
     let result = memo_handler.get_all();
-    if result.is_ok() != true {
-        return HttpResponse::InternalServerError().body("");
+    match result {
+        Ok(v) => {
+            return HttpResponse::Ok().json(v);
+        }
+        Err(e) => {
+            return HttpResponse::InternalServerError().body(e);
+        }
     }
-
-    return HttpResponse::Ok().json(result.unwrap);
 }
 
 pub fn register_routes(app: &mut web::ServiceConfig) {

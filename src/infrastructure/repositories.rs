@@ -6,15 +6,13 @@ use mongodb::options::ClientOptions;
 
 use bson::doc;
 
-use std::error::Error;
-
 pub struct PersistentMemoRepository {
     client: Client
 }
 
 impl PersistentMemoRepository {
     pub fn new() -> PersistentMemoRepository {
-        let db_url = "";
+        let db_url = "mongodb://localhost:27017";
         let mut client_options: ClientOptions = ClientOptions::parse(db_url).unwrap();
         client_options.app_name = Some("todo_backend".to_string());
         let client = Client::with_options(client_options).unwrap();
@@ -25,7 +23,7 @@ impl PersistentMemoRepository {
 }
 
 impl MemoRepository for PersistentMemoRepository {
-    fn get_all(&self) -> Result<Vec<Memo>, Error> {
+    fn get_all(&self) -> Result<Vec<Memo>, &'static str> {
         let database = self.client.database("todo");
         let collection = database.collection("todo");
 
@@ -38,14 +36,14 @@ impl MemoRepository for PersistentMemoRepository {
                 let data: bson::ordered::OrderedDocument = result.unwrap();
                 let memo_parse_result = bson::from_bson(bson::Bson::Document(data));
                 if memo_parse_result.is_ok() != true {
-                    return Err();
+                    return Err("data cannot be parsed");
                 }
                 response_data.push(memo_parse_result.unwrap());
             } else {
-                return Err();
+                return Err("data cannot be parsed");
             }
         }
 
-        return response_data;
+        return Ok(response_data);
     }
 }

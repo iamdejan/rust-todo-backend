@@ -1,21 +1,20 @@
 use super::repositories::MemoRepository;
 use crate::infrastructure::repositories::PersistentMemoRepository;
-use std::error::Error;
 use crate::domain::entities::Memo;
 
-pub struct MemoHandler {
-    memo_repository: MemoRepository
+pub struct MemoHandler<R: MemoRepository + ?Sized> {
+    memo_repository: R
 }
 
-impl MemoHandler {
-    pub fn new() -> MemoHandler {
+impl MemoHandler<PersistentMemoRepository> {
+    pub fn new() -> Self {
         //TODO: create strategy pattern based on parameter
-        return MemoHandler {
+        return Self {
             memo_repository: PersistentMemoRepository::new()
         };
     }
 
-    pub fn get_all(&self) -> Result<Vec<Memo>, Error> {
+    pub fn get_all(&self) -> Result<Vec<Memo>, &'static str> {
         return self.memo_repository.get_all();
     }
 }
