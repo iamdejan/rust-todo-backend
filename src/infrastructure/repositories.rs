@@ -1,10 +1,11 @@
-use crate::domain::repositories::MemoRepository;
-use crate::domain::entities::Memo;
-
 use mongodb::Client;
 use mongodb::options::ClientOptions;
+use mongodb::results::InsertOneResult;
+use bson::{doc, bson, Bson};
 
-use bson::doc;
+use super::forms::AddTODOForm;
+use crate::domain::repositories::MemoRepository;
+use crate::domain::entities::Memo;
 
 pub struct PersistentMemoRepository {
     client: Client
@@ -20,13 +21,17 @@ impl PersistentMemoRepository {
             client
         };
     }
+
+    fn get_collection(&self) -> mongodb::Collection {
+        let database = self.client.database("todo");
+        let collection = database.collection("todo");
+        return collection;
+    }
 }
 
 impl MemoRepository for PersistentMemoRepository {
     fn get_all(&self) -> Result<Vec<Memo>, &'static str> {
-        let database = self.client.database("todo");
-        let collection = database.collection("todo");
-
+        let collection = self.get_collection();
         let filter = doc! {};
         let all_data_cursor = collection.find(filter, None).unwrap();
 
@@ -45,5 +50,17 @@ impl MemoRepository for PersistentMemoRepository {
         }
 
         return Ok(response_data);
+    }
+
+    fn insert(&self, form: AddTODOForm) -> Result<Bson, &'static str> {
+        let collection = self.get_collection();
+        let result = collection.insert_one(doc! { "title": form.title.as_str(), "description": form.description }, None);
+
+        if result.is_ok() != true {
+            return Err("Failed to insert");
+        }
+
+        let insert_one_result: InsertOneResult = result.unwrap();
+        return Ok(insert_one_result.inserted_id);
     }
 }
