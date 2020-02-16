@@ -1,15 +1,11 @@
-use actix_web::{test, App};
-use crate::routes::{routes};
-use crate::model::memo::Memo;
 use std::str;
-use mongodb::{Client, options::ClientOptions};
 
-fn initiate_mongodb(db_url: &str) -> Client {
-    let mut client_options: ClientOptions = ClientOptions::parse(db_url).unwrap();
-    client_options.app_name = Some("todo_backend".to_string());
-    let client = Client::with_options(client_options).unwrap();
-    return client;
-}
+use actix_web::{test, App};
+use serde_json::{Value, Map};
+
+use crate::application::routes;
+use crate::domain::entities::Memo;
+use crate::infrastructure::forms::AddTODOForm;
 
 #[test]
 fn testing_true() {
@@ -45,14 +41,33 @@ async fn testing_hello_world_route_with_name() {
 
 #[allow(non_snake_case)]
 #[actix_rt::test]
-async fn testing_get_all_TODOs() {
-    //TODO: use mock database
+async fn testing_get_and_insert() {
     let mut app = test::init_service(
-        App::new().data(initiate_mongodb("mongodb://localhost:27017")).configure(routes::register_routes)
+        App::new().configure(routes::register_routes)
     ).await;
+
     let request = test::TestRequest::get().uri("/todos").to_request();
     let result: Vec<Memo> = test::read_response_json(&mut app, request).await;
+    let beginning_length = result.len();
 
-    //TODO: change this test
-    assert_eq!(1, result.len());
+    //insert TODO
+    let add_form: AddTODOForm = AddTODOForm {
+        title: "Victor Robotics Suite".to_string(),
+        description: "Create library".to_string()
+    };
+    let request = test::TestRequest::post().set_form(&add_form).uri("/todos/add").to_request();
+    let service_response = test::call_service(&mut app, request).await;
+    assert_eq!(200, service_response.status().as_u16());
+    let response_body = test::read_body(service_response).await;
+    let response_body = str::from_utf8(&response_body).unwrap();
+    let parsed: Value = serde_json::from_str(response_body).unwrap();
+    let map: Map<String, Value> = parsed.as_object().unwrap().clone();
+    assert_ne!(true, map["$oid"].as_str().unwrap().is_empty());
+    // assert_eq!("", format!("{:?}", map));
+
+    let request = test::TestRequest::get().uri("/todos").to_request();
+    let result: Vec<Memo> = test::read_response_json(&mut app, request).await;
+    let end_length = result.len();
+
+    assert_eq!(1, end_length - beginning_length);
 }
