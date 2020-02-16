@@ -1,6 +1,6 @@
 use actix_web::{web, HttpRequest, HttpResponse};
 
-use crate::domain::handlers::MemoHandler;
+use crate::domain::handlers::PersistentMemoHandler;
 
 pub async fn test_route(request: HttpRequest) -> HttpResponse {
     let name = request.match_info().get("name").unwrap_or("Unknown");
@@ -9,7 +9,7 @@ pub async fn test_route(request: HttpRequest) -> HttpResponse {
 
 #[allow(non_snake_case)]
 pub async fn get_all_TODOs() -> HttpResponse {
-    let memo_handler = MemoHandler::new();
+    let memo_handler = PersistentMemoHandler::new();
     let result = memo_handler.get_all();
     match result {
         Ok(v) => {
