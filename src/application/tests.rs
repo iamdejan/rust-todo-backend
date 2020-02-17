@@ -62,8 +62,7 @@ async fn testing_get_and_insert() {
     let response_body = str::from_utf8(&response_body).unwrap();
     let parsed: Value = serde_json::from_str(response_body).unwrap();
     let map: Map<String, Value> = parsed.as_object().unwrap().clone();
-    assert_ne!(true, map["$oid"].as_str().unwrap().is_empty());
-    // assert_eq!("", format!("{:?}", map));
+    assert!(map["$oid"].as_str().unwrap().is_empty() != true);
 
     let request = test::TestRequest::get().uri("/todos").to_request();
     let result: Vec<Memo> = test::read_response_json(&mut app, request).await;
