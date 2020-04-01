@@ -2,16 +2,15 @@ dist: bionic
 
 language: rust
 rust:
-    - 1.42.0
+  - 1.42.0
 
 services:
-    - mongodb
+  - mongodb
 
 before_script:
-    - apt install mongodb-clients
-    - sleep 20
-    - mongo todo --eval 'db.todo.find();'
+  - sleep 20
+  - mongo todo --eval 'db.todo.find();'
 
 script:
-    - cargo build --verbose --all
-    - sh test.sh
+  - cargo build --verbose --all
+  - sh test.sh
