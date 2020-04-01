@@ -4,10 +4,12 @@ language: rust
 rust:
   - 1.42.0
 
-services:
-  - mongodb
+services: mongodb
 
 before_script:
+  - sudo systemctl daemon-reload
+  - sleep 20
+  - sudo systemctl start mongod
   - sleep 20
   - mongo todo --eval 'db.todo.find();'
 
