@@ -1,7 +1,7 @@
 use mongodb::Client;
 use mongodb::options::ClientOptions;
 use mongodb::results::InsertOneResult;
-use bson::{doc, bson, Bson};
+use bson::{doc, Bson};
 
 use super::forms::AddTODOForm;
 use crate::domain::repositories::MemoRepository;
@@ -15,7 +15,7 @@ impl PersistentMemoRepository {
     pub fn new() -> PersistentMemoRepository {
         let db_url = "mongodb://localhost:27017";
         let mut client_options: ClientOptions = ClientOptions::parse(db_url).unwrap();
-        client_options.app_name = Some("todo_backend".to_string());
+        client_options.app_name = Some("todo-backend".to_string());
         let client = Client::with_options(client_options).unwrap();
         return PersistentMemoRepository {
             client
