@@ -5,12 +5,11 @@ rust:
     - 1.42.0
 
 services:
-    - mondogb
+    - mongodb
 
 before_script:
+    - apt install mongodb-clients
     - sleep 20
-    - use todo
-    - sleep 10
     - mongo todo --eval 'db.todo.find();'
 
 script:
