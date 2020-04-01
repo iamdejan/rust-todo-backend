@@ -1,0 +1,16 @@
+dist: bionic
+
+language: rust
+rust:
+    - 1.42.0
+
+services:
+    - mondogb
+
+before_script:
+    - sleep 20
+    - mongo todo --eval 'db.todo.find();'
+
+script:
+    - cargo build --verbose --all
+    - sh test.sh

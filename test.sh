@@ -1,1 +1,1 @@
-cargo test
+cargo test --verbose --all
