@@ -9,6 +9,8 @@ services:
 
 before_script:
     - sleep 20
+    - use todo
+    - sleep 10
     - mongo todo --eval 'db.todo.find();'
 
 script:
